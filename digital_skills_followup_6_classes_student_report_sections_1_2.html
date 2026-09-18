@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>سجل متابعة تطبيق المهارات العملية داخل الصف</title>
+<style>
+:root{--p:#0f766e;--bg:#f4f7fb;--line:#e5e7eb;--txt:#1f2937}
+*{box-sizing:border-box}body{font-family:Tahoma,Arial;margin:0;background:var(--bg);color:var(--txt)}
+.app{max-width:1280px;margin:auto;padding:12px}
+header{background:var(--p);color:white;border-radius:18px;padding:18px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+.brand{display:flex;align-items:center;gap:13px}.moe{background:white;color:var(--p);border-radius:14px;padding:12px 16px;text-align:center;font-weight:bold;min-width:105px}
+.moe small{display:block;color:#64748b;font-size:10px;margin-top:3px}h1{margin:0;font-size:28px}.credit{font-size:13px;line-height:1.8}
+.tabs,.actions{display:flex;gap:8px;flex-wrap:wrap}.tabs{margin:14px 0}
+button{font-family:inherit;border:0;border-radius:10px;padding:10px 14px;font-weight:bold;cursor:pointer}
+.tab{background:white}.tab.active,.primary{background:var(--p);color:white}.gray{background:#e5e7eb}.blue{background:#dbeafe;color:#1e40af}.red{background:#fee2e2;color:#991b1b}
+.panel{display:none}.panel.active{display:block}.card{background:white;border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px}
+.grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}.field label{display:block;font-size:12px;color:#64748b;margin-bottom:4px}
+input,select{width:100%;padding:9px;border:1px solid #cbd5e1;border-radius:9px;font-family:inherit;background:white}
+.skillsEditor{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.skillEdit{display:flex;gap:6px;align-items:end}.skillEdit .field{flex:1}
+.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}.stat{background:white;border:1px solid var(--line);border-radius:14px;padding:10px;text-align:center}.stat b{font-size:26px;display:block}
+.good{color:#15803d}.assist{color:#b45309}.need{color:#b91c1c}.wrap{overflow:auto;border:1px solid var(--line);border-radius:12px}
+table{width:100%;border-collapse:collapse;min-width:900px;background:white}th,td{padding:8px;border-bottom:1px solid var(--line);text-align:center}th{background:#f8fafc;white-space:nowrap}.name{text-align:right;font-weight:bold;min-width:160px}
+.eval{display:flex;gap:4px;justify-content:center}.eval button{padding:6px 8px;background:#f3f4f6}.sel3{background:#dcfce7!important;color:#166534}.sel2{background:#fef3c7!important;color:#92400e}.sel1{background:#fee2e2!important;color:#991b1b}
+.report{background:white;border:1px dashed #94a3b8;border-radius:14px;padding:16px}.hint{font-size:12px;color:#64748b}.footer{text-align:center;color:#64748b;font-size:12px;padding:12px}
+@media(max-width:850px){.grid{grid-template-columns:repeat(2,1fr)}.skillsEditor{grid-template-columns:1fr}.summary{grid-template-columns:repeat(2,1fr)}.credit{display:none}}
+@media(max-width:520px){.grid{grid-template-columns:1fr}.app{padding:7px}h1{font-size:22px}.moe{min-width:85px;padding:9px}.tabs button{flex:1}}
+@media print{
+ .tabs,#followPanel,#settingsPanel,.no-print{display:none!important}#reportsPanel{display:block!important}
+ body{background:white}.app{max-width:none;padding:0}.card,.report{border:0}.report{padding:0}
+ header{background:white!important;color:#111!important;border-bottom:2px solid var(--p);border-radius:0}.credit{display:block;color:#111}.moe{border:1px solid #ddd}
+ @page{size:A4 landscape;margin:10mm}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+ <div class="brand"><div class="moe">وزارة التعليم<small>Ministry of Education</small></div>
+ <div><h1>سجل متابعة تطبيق المهارات العملية داخل الصف</h1><div>متابعة الأداء العملي وإصدار التقارير</div></div></div>
+ <div class="credit">برمجة معلم المهارات الرقمية<br><b>عبدالله بن رشيد الدريبي</b></div>
+</header>
+
+<div class="tabs">
+ <button class="tab active" onclick="showTab('follow',this)">✅ المتابعة</button>
+ <button class="tab" onclick="showTab('reports',this)">📄 التقارير</button>
+ <button class="tab" onclick="showTab(\'studentReport\',this)">👤 تقرير طالب</button><button class="tab" onclick="showTab('settings',this)">⚙️ أسماء الطلاب</button>
+</div>
+
+<section id="followPanel" class="panel active">
+<div class="card">
+ <div class="grid">
+  <div class="field"><label>اليوم</label><select id="day"><option>الأحد</option><option>الاثنين</option><option>الثلاثاء</option><option>الأربعاء</option><option>الخميس</option></select></div>
+  <div class="field"><label>التاريخ الهجري</label><input id="hijriDate" readonly></div>
+  <div class="field"><label>الصف</label><select id="grade" onchange="changeClass()"><option>الرابع</option><option>الخامس</option><option>السادس</option></select></div>
+  <div class="field"><label>الفصل</label><select id="section" onchange="changeClass()"><option>1</option><option>2</option></select></div>
+  <div class="field"><label>الدرس</label><input id="lesson"></div>
+  <div class="field"><label>النشاط / التمرين</label><input id="activity"></div>
+ </div>
+
+ <div style="margin-top:12px"><b>المهارات المراد تقييمها</b> <span class="hint">يمكنك إضافة العدد الذي تحتاجه.</span></div>
+ <div id="skillsEditor" class="skillsEditor"></div>
+ <div class="actions" style="margin-top:8px">
+   <button class="blue" onclick="addSkill()">➕ إضافة مهارة</button>
+ </div>
+
+ <div class="grid" style="margin-top:10px">
+  <div class="field" style="grid-column:span 6"><label>ملاحظة عامة للحصة</label><input id="generalNote"></div>
+ </div>
+ <div class="actions" style="margin-top:10px">
+  <button class="primary" onclick="saveSession()">💾 حفظ الحصة</button>
+  <button class="gray" onclick="clearEval()">🧹 مسح التقييمات</button>
+ </div>
+</div>
+
+<div class="summary">
+ <div class="stat"><b id="cAll">30</b>عدد الطلاب</div>
+ <div class="stat good"><b id="c3">0</b>متقن</div>
+ <div class="stat assist"><b id="c2">0</b>متقن بمساعدة</div>
+ <div class="stat need"><b id="c1">0</b>يحتاج تدريب</div>
+</div>
+
+<div class="card">
+ <div class="hint" style="margin-bottom:8px">3 = متقن &nbsp; | &nbsp; 2 = متقن بمساعدة &nbsp; | &nbsp; 1 = يحتاج تدريب</div>
+ <div class="wrap"><table><thead id="followHead"></thead><tbody id="followBody"></tbody></table></div>
+</div>
+</section>
+
+<section id="reportsPanel" class="panel">
+<div class="card no-print">
+ <div class="grid">
+  <div class="field"><label>نوع التقرير</label><select id="rtype" onchange="toggleReportControls();buildReport()"><option value="activity">حسب النشاط / التمرين</option><option value="weekly">تقرير أسبوعي</option></select></div>
+  <div class="field activityCtl"><label>الحصة</label><select id="sessionSelect" onchange="buildReport()"></select></div>
+  <div class="field weeklyCtl" style="display:none"><label>من تاريخ هجري</label><select id="fromSession" onchange="buildReport()"></select></div>
+  <div class="field weeklyCtl" style="display:none"><label>إلى تاريخ هجري</label><select id="toSession" onchange="buildReport()"></select></div>
+ </div>
+ <div class="actions" style="margin-top:10px">
+  <button class="primary" onclick="window.print()">🖨️ طباعة / حفظ PDF</button>
+  <button class="blue" onclick="buildReport()">🔄 تحديث التقرير</button>
+ </div>
+ <div class="hint">من نافذة الطباعة اختر «حفظ كملف PDF» للحصول على نسخة PDF.</div>
+</div>
+<div id="report" class="report"><h2 style="text-align:center">تقرير متابعة المهارات الرقمية</h2></div>
+</section>
+
+
+<section id="studentReportPanel" class="panel">
+<div class="card">
+<h3>👤 تقرير مستوى الطالب في التطبيق العملي</h3>
+<div class="grid">
+<div class="field"><label>الصف</label><select id="srGrade" onchange="refreshStudentReportNames()"><option>الرابع</option><option>الخامس</option><option>السادس</option></select></div>
+<div class="field"><label>الفصل</label><select id="srSection" onchange="refreshStudentReportNames()"><option>1</option><option>2</option></select></div>
+<div class="field"><label>الطالب</label><select id="srStudent"></select></div>
+<div class="field"><label>من تاريخ</label><input type="date" id="srFrom"></div>
+<div class="field"><label>إلى تاريخ</label><input type="date" id="srTo"></div>
+</div>
+<div class="actions" style="margin-top:12px"><button class="primary" onclick="buildStudentReport()">📄 عرض التقرير</button><button class="gray" onclick="printStudentReport()">🖨️ طباعة / حفظ PDF</button></div>
+</div>
+<div id="studentReportOutput" class="card" style="margin-top:12px"><div class="hint">اختر الطالب ثم اضغط «عرض التقرير».</div></div>
+</section>
+
+<section id="settingsPanel" class="panel">
+<div class="card">
+<h3>أسماء الطلاب حسب الصف والفصل</h3>
+<div class="grid" style="margin-bottom:12px">
+ <div class="field"><label>الصف</label><select id="settingsGrade" onchange="loadSettingsClass()"><option>الرابع</option><option>الخامس</option><option>السادس</option></select></div>
+ <div class="field"><label>الفصل</label><select id="settingsSection" onchange="loadSettingsClass()"><option>1</option><option>2</option></select></div>
+</div>
+<div class="hint" style="margin-bottom:10px">لكل فصل قائمة مستقلة حتى 30 طالبًا. اختر الفصل ثم اكتب أسماء طلابه واحفظ.</div>
+<div id="namesGrid" class="grid"></div>
+<div class="actions" style="margin-top:10px"><button class="primary" onclick="saveNames()">💾 حفظ أسماء هذا الفصل</button><button class="gray" onclick="resetNames()">إعادة الأسماء الافتراضية لهذا الفصل</button></div>
+</div>
+</section>
+
+<div class="footer">برمجة معلم المهارات الرقمية: <b>عبدالله بن رشيد الدريبي</b></div>
+</div>
+
+<script>
+const KN='ds_class_rosters_v4',KS='ds_sessions_v4';
+const GRADES=['الرابع','الخامس','السادس'], SECTIONS=['1','2'];
+function defaultRoster(){return Array.from({length:30},(_,i)=>'الطالب '+(i+1))}
+function classKey(g,s){return g+'_'+s}
+let rosters=JSON.parse(localStorage.getItem(KN)||'null')||{};
+GRADES.forEach(g=>SECTIONS.forEach(s=>{if(!Array.isArray(rosters[classKey(g,s)]))rosters[classKey(g,s)]=defaultRoster()}));
+let names=[...rosters[classKey('الرابع','1')]];
+let sessions=JSON.parse(localStorage.getItem(KS)||'[]');
+let skills=['تنفيذ المهارة','الدقة في التطبيق','العمل باستقلالية'];
+let evals=Array.from({length:30},()=>({scores:[0,0,0],note:''}));
+let currentGregorian=new Date().toISOString().slice(0,10);
+
+function hijriFromISO(iso){
+  let d=new Date(iso+'T12:00:00');
+  let p=new Intl.DateTimeFormat('en-US-u-ca-islamic-umalqura',{year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(d);
+  let o={};p.forEach(x=>o[x.type]=x.value);
+  return `${o.year}/${o.month}/${o.day} هـ`;
+}
+function arabicDay(iso){
+  return new Intl.DateTimeFormat('ar-SA',{weekday:'long'}).format(new Date(iso+'T12:00:00'));
+}
+hijriDate.value=hijriFromISO(currentGregorian);
+let dd=arabicDay(currentGregorian); if([...day.options].some(o=>o.text===dd)) day.value=dd;
+
+function showTab(x,b){
+ document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.tab').forEach(p=>p.classList.remove('active'));
+ document.getElementById(x+'Panel').classList.add('active');b.classList.add('active');
+ if(x==='settings'){settingsGrade.value=grade.value;settingsSection.value=section.value;loadSettingsClass()} if(x==='studentReport'){srGrade.value=grade.value;srSection.value=section.value;refreshStudentReportNames();}
+ if(x==='reports'){refreshReportSelectors();toggleReportControls();buildReport()}
+}
+function changeClass(){
+ names=[...rosters[classKey(grade.value,section.value)]];
+ evals=Array.from({length:30},()=>({scores:Array(skills.length).fill(0),note:''}));
+ renderFollow();
+}
+function loadSettingsClass(){
+ names=[...rosters[classKey(settingsGrade.value,settingsSection.value)]];
+ renderNames();
+}
+function esc(x){return String(x??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function renderSkillsEditor(){
+ const box=document.getElementById('skillsEditor');box.innerHTML='';
+ skills.forEach((s,i)=>{
+   let d=document.createElement('div');d.className='skillEdit';
+   d.innerHTML=`<div class="field"><label>المهارة ${i+1}</label><input value="${esc(s)}" oninput="renameSkill(${i},this.value)"></div>
+   <button class="red" title="حذف المهارة" onclick="removeSkill(${i})">✕</button>`;
+   box.appendChild(d);
+ });
+}
+function renameSkill(i,v){skills[i]=v;renderFollow()}
+function addSkill(){
+ skills.push('مهارة جديدة'); evals.forEach(e=>e.scores.push(0));renderSkillsEditor();renderFollow();
+}
+function removeSkill(i){
+ if(skills.length===1){alert('يجب الإبقاء على مهارة واحدة على الأقل.');return}
+ skills.splice(i,1);evals.forEach(e=>e.scores.splice(i,1));renderSkillsEditor();renderFollow();
+}
+function avg(e){let a=e.scores.filter(v=>v>0);return a.length?a.reduce((x,y)=>x+y,0)/a.length:0}
+function level(v){return v>=2.5?'متقن':v>=1.5?'متقن بمساعدة':v>0?'يحتاج تدريب':'غير مقيم'}
+function evalBtns(si,ki,v){return [3,2,1].map(x=>`<button class="${v===x?'sel'+x:''}" onclick="setEval(${si},${ki},${x})">${x}</button>`).join('')}
+function setEval(si,ki,v){evals[si].scores[ki]=evals[si].scores[ki]===v?0:v;renderFollow()}
+function renderFollow(){
+ followHead.innerHTML='<tr><th>م</th><th>اسم الطالب</th>'+skills.map(s=>`<th>${esc(s)}</th>`).join('')+'<th>المستوى العام</th><th>ملاحظة</th></tr>';
+ followBody.innerHTML='';
+ evals.forEach((e,i)=>{
+   let tr=document.createElement('tr');
+   tr.innerHTML=`<td>${i+1}</td><td class="name">${esc(names[i]||'')}</td>`+
+   e.scores.map((v,k)=>`<td><div class="eval">${evalBtns(i,k,v)}</div></td>`).join('')+
+   `<td><b>${level(avg(e))}</b></td><td><input value="${esc(e.note)}" oninput="evals[${i}].note=this.value"></td>`;
+   followBody.appendChild(tr);
+ });updateSummary()
+}
+function updateSummary(){let x={m:0,a:0,n:0};evals.forEach(e=>{let l=level(avg(e));if(l==='متقن')x.m++;else if(l==='متقن بمساعدة')x.a++;else if(l==='يحتاج تدريب')x.n++});c3.textContent=x.m;c2.textContent=x.a;c1.textContent=x.n;cAll.textContent=names.filter(Boolean).length}
+function clearEval(){evals=Array.from({length:30},()=>({scores:Array(skills.length).fill(0),note:''}));renderFollow()}
+function saveSession(){
+ if(!activity.value.trim()){alert('اكتب اسم النشاط أو التمرين أولاً');return}
+ sessions.push({id:Date.now(),gdate:currentGregorian,hdate:hijriDate.value,day:day.value,grade:grade.value,section:section.value,lesson:lesson.value,activity:activity.value,skills:[...skills],note:generalNote.value,names:[...names],evals:JSON.parse(JSON.stringify(evals))});
+ localStorage.setItem(KS,JSON.stringify(sessions));refreshReportSelectors();alert('تم حفظ الحصة ✅')
+}
+function renderNames(){
+ namesGrid.innerHTML='';names.forEach((n,i)=>{let d=document.createElement('div');d.className='field';d.innerHTML=`<label>${i+1}</label><input id="nm${i}" value="${esc(n)}">`;namesGrid.appendChild(d)})
+}
+function saveNames(){
+ let edited=Array.from({length:30},(_,i)=>document.getElementById('nm'+i).value.trim());
+ rosters[classKey(settingsGrade.value,settingsSection.value)]=edited;
+ localStorage.setItem(KN,JSON.stringify(rosters));
+ if(grade.value===settingsGrade.value && section.value===settingsSection.value){names=[...edited];renderFollow()}
+ alert('تم حفظ أسماء '+settingsGrade.value+' '+settingsSection.value+' ✅');
+}
+function resetNames(){
+ names=defaultRoster();renderNames();
+}
+function refreshReportSelectors(){
+ const sorted=[...sessions].sort((a,b)=>a.gdate.localeCompare(b.gdate)||a.id-b.id);
+ sessionSelect.innerHTML='';fromSession.innerHTML='';toSession.innerHTML='';
+ [...sorted].reverse().forEach(s=>{let o=document.createElement('option');o.value=s.id;o.textContent=`${s.hdate} — ${s.activity}`;sessionSelect.appendChild(o)});
+ sorted.forEach(s=>{
+   let a=document.createElement('option');a.value=s.id;a.textContent=`${s.hdate} — ${s.activity}`;fromSession.appendChild(a);
+   let b=a.cloneNode(true);toSession.appendChild(b);
+ });
+ if(sorted.length){fromSession.value=sorted[0].id;toSession.value=sorted[sorted.length-1].id}
+}
+function toggleReportControls(){
+ document.querySelectorAll('.activityCtl').forEach(x=>x.style.display=rtype.value==='activity'?'block':'none');
+ document.querySelectorAll('.weeklyCtl').forEach(x=>x.style.display=rtype.value==='weekly'?'block':'none');
+}
+function activityReport(s){
+ let rows=s.evals.map((e,i)=>`<tr><td>${i+1}</td><td class="name">${esc(s.names[i]||'')}</td>`+
+ e.scores.map(v=>`<td>${v||'-'}</td>`).join('')+`<td>${level(avg(e))}</td><td>${esc(e.note)}</td></tr>`).join('');
+ return `<h2 style="text-align:center">تقرير نشاط / تمرين</h2>
+ <p><b>النشاط:</b> ${esc(s.activity)} &nbsp; <b>الدرس:</b> ${esc(s.lesson)} &nbsp; <b>اليوم:</b> ${esc(s.day)} &nbsp; <b>التاريخ الهجري:</b> ${esc(s.hdate)} &nbsp; <b>الصف:</b> ${esc(s.grade)} &nbsp; <b>الفصل:</b> ${esc(s.section)}</p>
+ <div class="wrap"><table><thead><tr><th>م</th><th>الطالب</th>${s.skills.map(k=>`<th>${esc(k)}</th>`).join('')}<th>المستوى العام</th><th>ملاحظة</th></tr></thead><tbody>${rows}</tbody></table></div>
+ ${s.note?`<p><b>ملاحظة عامة:</b> ${esc(s.note)}</p>`:''}`;
+}
+function weeklyReport(){
+ let fs=sessions.find(x=>x.id==fromSession.value),ts=sessions.find(x=>x.id==toSession.value);
+ if(!fs||!ts)return '<h2 style="text-align:center">لا توجد بيانات</h2>';
+ let from=fs.gdate<=ts.gdate?fs.gdate:ts.gdate,to=fs.gdate<=ts.gdate?ts.gdate:fs.gdate;
+ let arr=sessions.filter(s=>s.gdate>=from&&s.gdate<=to).sort((a,b)=>a.gdate.localeCompare(b.gdate));
+ let rows=names.map((n,i)=>{
+   let vals=[];arr.forEach(s=>{let e=s.evals[i];if(e){let v=avg(e);if(v)vals.push(v)}});
+   let av=vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:0;
+   return `<tr><td>${i+1}</td><td class="name">${esc(n||'')}</td><td>${vals.length}</td><td>${av?av.toFixed(1):'-'}</td><td>${level(av)}</td></tr>`;
+ }).join('');
+ return `<h2 style="text-align:center">التقرير الأسبوعي لمتابعة المهارات الرقمية</h2>
+ <p><b>الفترة الهجرية:</b> ${hijriFromISO(from)} إلى ${hijriFromISO(to)} &nbsp; <b>عدد الحصص:</b> ${arr.length}</p>
+ <div class="wrap"><table><thead><tr><th>م</th><th>الطالب</th><th>عدد التطبيقات المقيمة</th><th>المتوسط من 3</th><th>المستوى الأسبوعي</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+function buildReport(){
+ if(rtype.value==='activity'){let s=sessions.find(x=>x.id==sessionSelect.value);report.innerHTML=s?activityReport(s):'<h2 style="text-align:center">لا توجد حصة محفوظة</h2>'}
+ else report.innerHTML=weeklyReport();
+}
+names=[...rosters[classKey(grade.value,section.value)]];settingsGrade.value=grade.value;settingsSection.value=section.value;renderSkillsEditor();renderNames();renderFollow();refreshReportSelectors();toggleReportControls();
+
+function srEsc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+function refreshStudentReportNames(){
+ const roster=rosters[classKey(srGrade.value,srSection.value)]||defaultRoster(); srStudent.innerHTML='';
+ roster.forEach((n,i)=>{if((n||'').trim()){let o=document.createElement('option');o.value=i;o.textContent=n;srStudent.appendChild(o);}});
+}
+function srHijri(iso){if(!iso)return '';try{return new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura',{year:'numeric',month:'numeric',day:'numeric'}).format(new Date(iso+'T12:00:00'))+'هـ'}catch(e){return iso}}
+function buildStudentReport(){
+ const g=srGrade.value,se=srSection.value,idx=Number(srStudent.value||0),roster=rosters[classKey(g,se)]||defaultRoster(),name=roster[idx]||('الطالب '+(idx+1));
+ let rows=[],c={1:0,2:0,3:0},sum=0,total=0;
+ sessions.forEach(s=>{
+   if((s.grade||'')!==g||(s.section||'')!==se)return;
+   const d=s.isoDate||s.dateISO||s.gregorianDate||s.date||'';
+   if(srFrom.value&&d&&d<srFrom.value)return;if(srTo.value&&d&&d>srTo.value)return;
+   const e=Array.isArray(s.evals)?s.evals[idx]:null;if(!e)return;
+   const sk=Array.isArray(s.skills)?s.skills:skills,sc=Array.isArray(e.scores)?e.scores:[];
+   sk.forEach((x,j)=>{let v=Number(sc[j]||0);if(v){c[v]++;sum+=v;total++;rows.push([d,x,v,e.note||'']);}});
+ });
+ const lev=v=>v===3?'متقن':v===2?'متقن بمساعدة':'يحتاج تدريب';
+ const overall=!total?'لا توجد بيانات':sum/total>=2.5?'متقن':sum/total>=1.5?'متقن بمساعدة':'يحتاج تدريب';
+ const tr=rows.length?rows.map(r=>`<tr><td>${srEsc(srHijri(r[0]))}</td><td>${srEsc(r[1])}</td><td>${lev(r[2])}</td><td>${srEsc(r[3])}</td></tr>`).join(''):'<tr><td colspan="4">لا توجد تطبيقات محفوظة لهذا الطالب في الفترة المحددة.</td></tr>';
+ studentReportOutput.innerHTML=`<div id="studentPrintable"><div style="text-align:center"><b style="font-size:20px">وزارة التعليم</b><h2>تقرير مستوى الطالب في التطبيق العملي</h2></div>
+ <p><b>اسم الطالب:</b> ${srEsc(name)} &nbsp;&nbsp; <b>الصف:</b> ${srEsc(g)} ${srEsc(se)}</p>
+ <p><b>المستوى العام:</b> ${overall}</p>
+ <p><b>ملخص الأداء:</b> متقن: ${c[3]} | متقن بمساعدة: ${c[2]} | يحتاج تدريب: ${c[1]}</p>
+ <table style="width:100%;border-collapse:collapse"><thead><tr><th>التاريخ الهجري</th><th>المهارة</th><th>المستوى</th><th>الملاحظة</th></tr></thead><tbody>${tr}</tbody></table>
+ <p style="margin-top:16px"><b>توصية المعلم:</b> ${!total?'—':c[1]?'الاستمرار في التدريب على المهارات التي تحتاج إلى تعزيز.':'الاستمرار في المحافظة على مستوى الأداء وتنمية الاستقلالية في التطبيق.'}</p>
+ <div style="text-align:center;margin-top:28px;font-size:13px">برمجة معلم المهارات الرقمية: عبدالله بن رشيد الدريبي</div></div>`;
+}
+function printStudentReport(){
+ if(!document.getElementById('studentPrintable'))buildStudentReport();const el=document.getElementById('studentPrintable');if(!el)return;
+ const w=window.open('','_blank');w.document.write(`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>تقرير طالب</title><style>body{font-family:Arial,Tahoma;padding:24px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #777;padding:8px;text-align:center}</style></head><body>${el.innerHTML}</body></html>`);w.document.close();setTimeout(()=>w.print(),200);
+}
+
+refreshStudentReportNames();
+</script>
+</body>
+</html>
